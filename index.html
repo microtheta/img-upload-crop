@@ -1,0 +1,94 @@
+<!doctype HTML>
+<html>
+	<head>
+		<title> Upload and crop </title>
+		<link rel="stylesheet" href="croppie.css" />
+		<script src="jquery.min.js"></script>
+		<script src="croppie.js"></script>
+		<style>
+			.main {
+				text-align: center;
+    			margin-top: 50px;
+			}
+			.upload-demo #upload-demo,  .upload-demo .upload-result, .upload-demo.ready #upload-result-img, .upload-demo.ready #upload {
+				display: none;
+			}
+			.upload-demo.ready #upload-demo, .upload-demo.ready .upload-result  {
+				display: block;
+			}
+			.upload-result {
+				margin: 0 auto;
+			}
+			.result-img {
+				margin-top: 30px;
+			}
+		</style>
+
+	</head>
+	<body>
+
+		<div class="main">
+			
+			<div class="upload-demo">
+				<input type="file" id="upload" value="Choose a file" accept="image/*">
+				<br/>
+
+
+				<div class="uploaded-img" id="upload-demo"></div>
+				<button class="upload-result">Done</button>
+
+
+				<img class="result-img" id="upload-result-img">
+			</div>
+		</div>
+
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var $uploadCrop;
+				function readFile(input) {
+		 			if (input.files && input.files[0]) {
+			            var reader = new FileReader();
+			            reader.onload = function (e) {
+							$('.upload-demo').addClass('ready');
+			            	$uploadCrop.croppie('bind', {
+			            		url: e.target.result
+			            	});
+			            }
+			            reader.readAsDataURL(input.files[0]);
+			        }
+			        else {
+				        swal("Sorry - you're browser doesn't support the FileReader API");
+				    }
+				}
+
+				$uploadCrop = $('#upload-demo').croppie({
+					viewport: {
+						width: 150,
+						height: 150,
+						type: 'circle'
+					},
+					boundary: {
+						width: 200,
+						height: 200
+					}
+				});
+
+				$('#upload').on('change', function () { readFile(this); });
+
+				$('.upload-result').on('click', function (ev) {
+					$uploadCrop.croppie('result', {
+						type: 'canvas',
+						size: 'viewport'
+					}).then(function (resp) { 
+					//resp is base64 cropeed img
+						$('#upload-result-img').attr('src', resp);
+						$("#upload").val('')
+						$('.upload-demo').removeClass('ready');
+						
+					});
+				});
+		});
+		</script>
+	</body>
+</html>
